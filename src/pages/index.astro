@@ -1,11 +1,13 @@
 ---
-// Welcome to Astro! Everything between these triple-dash code fences
-// is your "component frontmatter". It never runs in the browser.
-console.log('This runs in your terminal, not the browser!');
+// components
+import App from '../components/App.tsx';
+// styles
+import '@styles/global.css';
 ---
 
 <html>
   <body>
     <h1>Hello, World!</h1>
+    <App client:load />
   </body>
 </html>
