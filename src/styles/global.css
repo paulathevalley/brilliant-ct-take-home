@@ -1,2 +1,9 @@
 @import 'mafs/core.css';
 @import 'mafs/font.css';
+
+.MafsView {
+  --mafs-fg: #999;
+  --mafs-bg: white;
+
+  --mafs-line-color: #ccc;
+}
