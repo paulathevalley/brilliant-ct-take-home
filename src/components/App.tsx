@@ -1,13 +1,8 @@
 import * as React from 'react';
 import { Mafs, Coordinates, Debug, Point, Polygon, useMovablePoint, Theme, Line } from 'mafs';
-import EYE from '../assets/eye.svg';
-import RawEyeSvg from '../assets/eye.svg?raw';
 
 const ROOM_WIDTH = 5;
 const ROOM_HEIGHT = 3;
-
-console.log(EYE);
-console.log(RawEyeSvg);
 
 function EyeAsset() {
   return (
