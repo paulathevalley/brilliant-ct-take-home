@@ -108,12 +108,65 @@ function AdjustableMirror() {
   );
 }
 
-export default function App() {
+function TriangleObject() {
   const triangle = {
     x: 3,
     y: 2,
   };
 
+  const OFFSET = [0.25 * 1.3, 0.25];
+
+  const renderVirtualObjects = (count) => {
+    return Array.from(new Array(count)).map((_, index) => {
+      const indexStart = index - 1;
+      const x = triangle.x + ROOM_WIDTH * indexStart;
+      // if indexStart is even, it should be reflected over the y-axis ("backwards")
+      const isEven = indexStart % 2 === 0;
+      return (
+        <Polygon
+          key={`virtual-triangle-${index}`}
+          points={[
+            [isEven ? x - OFFSET[0] : x + OFFSET[0], triangle.y + OFFSET[1]],
+            [isEven ? x - OFFSET[0] : x + OFFSET[0], triangle.y - OFFSET[1]],
+            [x, triangle.y],
+          ]}
+          color={Theme.red}
+          fillOpacity={0.5}
+          weight={0}
+        />
+      );
+    });
+  };
+
+  return (
+    <>
+      <Polygon
+        points={[
+          [triangle.x - OFFSET[0], triangle.y + OFFSET[1]],
+          [triangle.x - OFFSET[0], triangle.y - OFFSET[1]],
+          [triangle.x, triangle.y],
+        ]}
+        color={Theme.red}
+        fillOpacity={1}
+        weight={0}
+      />
+      {renderVirtualObjects(4)}
+    </>
+  );
+}
+
+function Room() {
+  return (
+    <>
+      <Line.Segment point1={[0, ROOM_HEIGHT]} point2={[ROOM_WIDTH, ROOM_HEIGHT]} color="#ccc" weight={3} />
+      <Line.Segment point1={[0, 0]} point2={[0, ROOM_HEIGHT]} color={Theme.blue} weight={6} />
+      <Line.Segment point1={[ROOM_WIDTH, ROOM_HEIGHT]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
+      <Line.Segment point1={[0, 0]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
+    </>
+  );
+}
+
+export default function App() {
   const radius = 3;
   // Reference: https://mafs.dev/guides/interaction/movable-point
   const radialMotion = useMovablePoint([radius, 0], {
@@ -128,53 +181,13 @@ export default function App() {
   // atan2 returns the angle in the plane (in radians)
   const userAngle = Math.atan2(radialMotion.point[1], radialMotion.point[0]);
 
-  const OFFSET = [0.25 * 1.3, 0.25];
-
-  const renderVirtualObjects = (x, y, count) => {
-    return Array.from(new Array(count)).map((_, index) => {
-      const start = index + 1;
-      const x = triangle.x + ROOM_WIDTH * start;
-      // if start is odd, it should be reflected over the y-axis ("backwards")
-      const isOdd = start % 2 > 0;
-      return (
-        <Polygon
-          points={[
-            [isOdd ? x + OFFSET[0] : x - OFFSET[0], triangle.y + OFFSET[1]],
-            [isOdd ? x + OFFSET[0] : x - OFFSET[0], triangle.y - OFFSET[1]],
-            [x, triangle.y],
-          ]}
-          color={Theme.red}
-          fillOpacity={0.5}
-          weight={0}
-        />
-      );
-    });
-  };
-
   return (
     <Mafs viewBox={{ y: [0, ROOM_HEIGHT], x: [-ROOM_WIDTH, ROOM_WIDTH * 5] }}>
       <Coordinates.Cartesian />
 
-      <Line.Segment point1={[0, ROOM_HEIGHT]} point2={[ROOM_WIDTH, ROOM_HEIGHT]} color="#ccc" weight={3} />
-      <Line.Segment point1={[0, 0]} point2={[0, ROOM_HEIGHT]} color={Theme.blue} weight={6} />
-      <Line.Segment point1={[ROOM_WIDTH, ROOM_HEIGHT]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
-      <Line.Segment point1={[0, 0]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
+      <Room />
 
-      <Polygon
-        points={[
-          [triangle.x - OFFSET[0], triangle.y + OFFSET[1]],
-          [triangle.x - OFFSET[0], triangle.y - OFFSET[1]],
-          [triangle.x, triangle.y],
-        ]}
-        color={Theme.red}
-        fillOpacity={1}
-        weight={0}
-      />
-      {renderVirtualObjects(triangle.x, triangle.y, 3)}
-
-      {/* {c.element} */}
-
-      {/* <Line.ThroughPoints point1={[0, 0]} point2={radialMotion.point} color={Theme.violet} style="dashed" /> */}
+      <TriangleObject />
 
       <AdjustableMirror />
 
