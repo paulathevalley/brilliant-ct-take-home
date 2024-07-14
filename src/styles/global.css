@@ -2,8 +2,8 @@
 @import 'mafs/font.css';
 
 .MafsView {
-  --mafs-fg: #999;
+  --mafs-fg: #ccc;
   --mafs-bg: white;
 
-  --mafs-line-color: #ccc;
+  --mafs-line-color: #eee;
 }

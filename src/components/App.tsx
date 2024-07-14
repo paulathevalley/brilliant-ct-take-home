@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Coordinates, Debug, Line, Mafs, Plot, Point, Polygon, Theme, Transform, useMovablePoint, vec, Vector } from 'mafs';
+import { Coordinates, Debug, Line, Mafs, MovablePoint, Plot, Point, Polygon, Theme, Transform, useMovablePoint, vec, Vector } from 'mafs';
 
 const ROOM_WIDTH = 5;
 const ROOM_HEIGHT = 3;
@@ -13,7 +13,7 @@ function inverseRotate(v, a) {
   return [v[0] * c + v[1] * s, v[0] * -1 * s + v[1] * c];
 }
 
-function ObservingEye({ at }) {
+function ObservingEye({ at, color }) {
   const id = `eye-${React.useId()}`;
   const [x, y] = at;
   const size = 1;
@@ -22,12 +22,16 @@ function ObservingEye({ at }) {
   return (
     <>
       <g style={{ transform: `var(--mafs-view-transform) var(--mafs-user-transform)` }}>
+        <clipPath id={`${id}-bg`}>
+          <path d="M.603.79A.309.309 0 0 0 .71.728.239.239 0 0 1 .713.273.31.31 0 0 0 .609.209a1.085 1.085 0 0 1-.21.19 2.154 2.154 0 0 1-.16.103C.283.53.341.567.4.61a1.237 1.237 0 0 1 .202.18Z" />
+        </clipPath>
         <clipPath id={id}>
-          <path d="M.534 0c.024 0 .043.02.043.044a.167.167 0 0 1-.025.08.5.5 0 0 1-.057.077 1.562 1.562 0 0 1-.161.155A3.415 3.415 0 0 1 .153.5a3.276 3.276 0 0 1 .18.139C.392.686.452.74.497.793a.478.478 0 0 1 .056.08.18.18 0 0 1 .025.083.044.044 0 1 1-.087 0A.095.095 0 0 0 .476.914.393.393 0 0 0 .429.85 1.318 1.318 0 0 0 .278.705 2.896 2.896 0 0 0 .054.537L0 .5.053.464a1.232 1.232 0 0 0 .07-.051C.164.381.22.338.276.29.334.242.39.19.43.144A.414.414 0 0 0 .476.081.085.085 0 0 0 .49.044C.49.02.51 0 .534 0Z" />
-          <path d="M.63.247a.288.288 0 0 0 0 .508.456.456 0 0 0 0-.508Z" />
+          <path d="M.71.728A.308.308 0 0 0 .713.273.239.239 0 0 0 .71.728Z" />
+          <path d="M.612 0c.031 0 .057.026.057.057C.669.13.626.195.578.248.528.303.463.355.4.399A2.154 2.154 0 0 1 .24.502C.284.53.342.567.4.61c.062.046.127.098.176.152a.454.454 0 0 1 .064.084.2.2 0 0 1 .028.097.057.057 0 1 1-.114 0A.09.09 0 0 0 .54.902.342.342 0 0 0 .493.839a1.127 1.127 0 0 0-.16-.136A2.47 2.47 0 0 0 .096.55L0 .498l.097-.05h.001a.796.796 0 0 0 .073-.04C.216.384.275.349.334.307A.974.974 0 0 0 .493.17C.536.123.555.084.555.057.555.026.58 0 .612 0Z" />
         </clipPath>
         <g transform={`translate(${translate[0]}, ${translate[1]})`}>
-          <rect clipPath={`url(#${id})`} width={size} height={size} fill={Theme.pink} />
+          <rect clipPath={`url(#${id}-bg)`} width={size} height={size} fill={Theme.background} />
+          <rect clipPath={`url(#${id})`} width={size} height={size} fill={color || Theme.foreground} />
         </g>
       </g>
     </>
@@ -52,17 +56,18 @@ export default function App() {
     },
   });
 
-  const radius = 1.5;
+  const radius = 3;
   // Source: https://mafs.dev/guides/interaction/movable-points
   const radialMotion = useMovablePoint([radius, 0], {
     // Constrain this point to specific angles from the center
     constrain: (point) => {
       const angle = Math.atan2(point[1], point[0]);
-      const snap = Math.PI / 16;
-      const roundedAngle = Math.round(angle / snap) * snap;
-      const newPoint = vec.rotate([radius, 0], roundedAngle);
+      // const snap = Math.PI / 32;
+      // const roundedAngle = Math.round(angle / snap) * snap;
+      const newPoint = vec.rotate([radius, 0], angle);
       return newPoint;
     },
+    color: Theme.violet,
   });
 
   // atan2 returns the angle in the plane (in radians)
@@ -82,9 +87,12 @@ export default function App() {
 
       {c.element}
 
+      {/* <Line.ThroughPoints point1={[0, 0]} point2={radialMotion.point} color={Theme.violet} style="dashed" /> */}
+
+      <Vector tail={[0, 0]} tip={radialMotion.point} color={Theme.violet} />
       {radialMotion.element}
       <Transform rotate={userAngle}>
-        <ObservingEye at={[0, 0]} />
+        <ObservingEye at={[0, 0]} color={Theme.violet} />
       </Transform>
 
       {/* <Debug.TransformWidget> */}
