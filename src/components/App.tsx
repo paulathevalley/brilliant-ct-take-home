@@ -1,5 +1,21 @@
 import * as React from 'react';
-import { Coordinates, Debug, Line, Mafs, MovablePoint, Plot, Point, Polygon, Theme, Transform, useMovablePoint, vec, Vector } from 'mafs';
+import {
+  Coordinates,
+  Debug,
+  Line,
+  Mafs,
+  MovablePoint,
+  Plot,
+  Point,
+  Polygon,
+  Theme,
+  Transform,
+  useMovablePoint,
+  vec,
+  Vector,
+  type UseMovablePointArguments,
+} from 'mafs';
+import range from 'lodash/range';
 
 const ROOM_WIDTH = 5;
 const ROOM_HEIGHT = 3;
@@ -38,32 +54,71 @@ function ObservingEye({ at, color }) {
   );
 }
 
-export default function App() {
-  const c = useMovablePoint([3, 2], {
-    // Constrain `point` to be within the boundaries of the room
-    constrain: ([x, y]) => {
-      const withinRoom = (a: number, max: number) => {
-        if (a > max) {
-          return max;
-        } else if (a < 0) {
-          return 0;
-        } else {
-          return a;
-        }
-      };
-
-      return [withinRoom(x, ROOM_WIDTH), withinRoom(y, ROOM_HEIGHT)];
-    },
+// reference: dynamic movable points https://mafs.dev/guides/interaction/movable-points
+function AdjustableMirror() {
+  const constrain: UseMovablePointArguments['constrain'] = ([x, y]) => {
+    // Only allow lengthening the mirror (along the y-axis)
+    // and do not break out of room
+    if (y < 0) {
+      return [ROOM_WIDTH, 0];
+    }
+    if (y > ROOM_HEIGHT) {
+      return [ROOM_WIDTH, ROOM_HEIGHT];
+    }
+    return [ROOM_WIDTH, y];
+  };
+  const start = useMovablePoint([ROOM_WIDTH, 2], {
+    constrain: constrain,
+    color: Theme.blue,
+  });
+  const end = useMovablePoint([ROOM_WIDTH, 0], {
+    constrain: constrain,
+    color: Theme.blue,
   });
 
+  function shift(shiftBy: vec.Vector2) {
+    // Only allow shifting along the y-axis
+    // TODO: do not break out of room
+    start.setPoint(vec.add(start.point, [0, shiftBy[1]]));
+    end.setPoint(vec.add(end.point, [0, shiftBy[1]]));
+  }
+
+  const length = vec.dist(start.point, end.point);
+  const START = 0.75;
+  const STEP = 0.75;
+  const END = length - 0.75;
+  const betweenPoints = range(START, END, STEP).map((t) => vec.lerp(start.point, end.point, t / length));
+
+  return (
+    <>
+      <Line.Segment point1={start.point} point2={end.point} color={Theme.blue} weight={6} />
+      {start.element}
+      {betweenPoints.map((point, i) => (
+        <MovablePoint
+          key={i}
+          point={point}
+          color={'#096bff'}
+          onMove={(newPoint) => {
+            shift(vec.sub(newPoint, point));
+          }}
+        />
+      ))}
+      {end.element}
+    </>
+  );
+}
+
+export default function App() {
+  const triangle = {
+    x: 3,
+    y: 2,
+  };
+
   const radius = 3;
-  // Source: https://mafs.dev/guides/interaction/movable-points
+  // Reference: https://mafs.dev/guides/interaction/movable-point
   const radialMotion = useMovablePoint([radius, 0], {
-    // Constrain this point to specific angles from the center
     constrain: (point) => {
       const angle = Math.atan2(point[1], point[0]);
-      // const snap = Math.PI / 32;
-      // const roundedAngle = Math.round(angle / snap) * snap;
       const newPoint = vec.rotate([radius, 0], angle);
       return newPoint;
     },
@@ -73,21 +128,55 @@ export default function App() {
   // atan2 returns the angle in the plane (in radians)
   const userAngle = Math.atan2(radialMotion.point[1], radialMotion.point[0]);
 
+  const OFFSET = [0.25 * 1.3, 0.25];
+
+  const renderVirtualObjects = (x, y, count) => {
+    return Array.from(new Array(count)).map((_, index) => {
+      const start = index + 1;
+      const x = triangle.x + ROOM_WIDTH * start;
+      // if start is odd, it should be reflected over the y-axis ("backwards")
+      const isOdd = start % 2 > 0;
+      return (
+        <Polygon
+          points={[
+            [isOdd ? x + OFFSET[0] : x - OFFSET[0], triangle.y + OFFSET[1]],
+            [isOdd ? x + OFFSET[0] : x - OFFSET[0], triangle.y - OFFSET[1]],
+            [x, triangle.y],
+          ]}
+          color={Theme.red}
+          fillOpacity={0.5}
+          weight={0}
+        />
+      );
+    });
+  };
+
   return (
     <Mafs viewBox={{ y: [0, ROOM_HEIGHT], x: [-ROOM_WIDTH, ROOM_WIDTH * 5] }}>
       <Coordinates.Cartesian />
 
-      <Line.Segment point1={[0, ROOM_HEIGHT]} point2={[ROOM_WIDTH, ROOM_HEIGHT]} />
-      <Line.Segment point1={[0, 0]} point2={[0, ROOM_HEIGHT]} color={Theme.blue} />
-      <Line.Segment point1={[ROOM_WIDTH, ROOM_HEIGHT]} point2={[ROOM_WIDTH, 0]} color={Theme.blue} />
-      <Line.Segment point1={[0, 0]} point2={[ROOM_WIDTH, 0]} />
+      <Line.Segment point1={[0, ROOM_HEIGHT]} point2={[ROOM_WIDTH, ROOM_HEIGHT]} color="#ccc" weight={3} />
+      <Line.Segment point1={[0, 0]} point2={[0, ROOM_HEIGHT]} color={Theme.blue} weight={6} />
+      <Line.Segment point1={[ROOM_WIDTH, ROOM_HEIGHT]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
+      <Line.Segment point1={[0, 0]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
 
-      <Point x={-c.x} y={c.y} />
-      <Point x={c.x + ROOM_WIDTH} y={c.y} />
+      <Polygon
+        points={[
+          [triangle.x - OFFSET[0], triangle.y + OFFSET[1]],
+          [triangle.x - OFFSET[0], triangle.y - OFFSET[1]],
+          [triangle.x, triangle.y],
+        ]}
+        color={Theme.red}
+        fillOpacity={1}
+        weight={0}
+      />
+      {renderVirtualObjects(triangle.x, triangle.y, 3)}
 
-      {c.element}
+      {/* {c.element} */}
 
       {/* <Line.ThroughPoints point1={[0, 0]} point2={radialMotion.point} color={Theme.violet} style="dashed" /> */}
+
+      <AdjustableMirror />
 
       <Vector tail={[0, 0]} tip={radialMotion.point} color={Theme.violet} />
       {radialMotion.element}
