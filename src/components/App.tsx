@@ -31,6 +31,7 @@ function inverseRotate(v, a) {
 }
 
 function Room({ count }) {
+  // Render real room + virtual rooms
   const renderRooms = Array.from(new Array(count)).map((_, index) => {
     const indexStart = index - 1;
     const isEven = indexStart % 2 === 0;
@@ -58,10 +59,10 @@ function Room({ count }) {
     );
   });
 
-  return <>{renderRooms}</>;
+  return renderRooms;
 }
 
-function ObservingEye({ at, color }) {
+function Observer({ at, color }) {
   const id = `eye-${React.useId()}`;
   const [x, y] = at;
   const size = 1;
@@ -123,7 +124,8 @@ function AdjustableMirror({ midpoint, setMidpoint }) {
   );
 }
 
-function TriangleObject() {
+function Object() {
+  // render real object & virtual objects
   const triangle = {
     x: 3,
     y: 2,
@@ -203,12 +205,12 @@ export default function App() {
 
       <Room count={VIRTUAL_COUNT} />
 
-      <TriangleObject />
+      <Object />
 
       {/* <Vector tail={[0, 0]} tip={midPoint} color={Theme.violet} /> */}
       <Line.ThroughPoints point1={[0, 0]} point2={midpoint} color={Theme.violet} style="dashed" />
       <Transform rotate={userAngle}>
-        <ObservingEye at={[0, 0]} color={'#000'} />
+        <Observer at={[0, 0]} color={'#000'} />
       </Transform>
 
       <AdjustableMirror midpoint={midpoint} setMidpoint={setMidpoint} />
