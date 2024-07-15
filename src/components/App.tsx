@@ -71,7 +71,6 @@ function AdjustableMirror({ midpoint, setMidpoint }) {
 
   const [start, setStart] = React.useState<vec.Vector2>([ROOM_WIDTH, 1]);
   const [end, setEnd] = React.useState([ROOM_WIDTH, 0] as vec.Vector2);
-  // const [midPoint, setMidpoint] = React.useState<vec.Vector2>(vec.lerp(start, end, 0.5));
 
   return (
     <>
