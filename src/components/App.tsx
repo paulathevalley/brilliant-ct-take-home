@@ -29,6 +29,17 @@ function inverseRotate(v, a) {
   return [v[0] * c + v[1] * s, v[0] * -1 * s + v[1] * c];
 }
 
+function Room() {
+  return (
+    <>
+      <Line.Segment point1={[0, ROOM_HEIGHT]} point2={[ROOM_WIDTH, ROOM_HEIGHT]} color="#ccc" weight={3} />
+      <Line.Segment point1={[0, 0]} point2={[0, ROOM_HEIGHT]} color={Theme.blue} weight={6} />
+      <Line.Segment point1={[ROOM_WIDTH, ROOM_HEIGHT]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
+      <Line.Segment point1={[0, 0]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
+    </>
+  );
+}
+
 function ObservingEye({ at, color }) {
   const id = `eye-${React.useId()}`;
   const [x, y] = at;
@@ -138,22 +149,13 @@ function TriangleObject() {
   );
 }
 
-function Room() {
-  return (
-    <>
-      <Line.Segment point1={[0, ROOM_HEIGHT]} point2={[ROOM_WIDTH, ROOM_HEIGHT]} color="#ccc" weight={3} />
-      <Line.Segment point1={[0, 0]} point2={[0, ROOM_HEIGHT]} color={Theme.blue} weight={6} />
-      <Line.Segment point1={[ROOM_WIDTH, ROOM_HEIGHT]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
-      <Line.Segment point1={[0, 0]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
-    </>
-  );
-}
-
 export default function App() {
   const [midpoint, setMidpoint] = React.useState<vec.Vector2>(vec.lerp([ROOM_WIDTH, 1], [ROOM_WIDTH, 0], 0.5));
 
   // atan2 returns the angle in the plane (in radians)
   const userAngle = Math.atan2(midpoint[1], midpoint[0]);
+
+  // TODO: Check if light ray passes through any virtual object
 
   return (
     <Mafs viewBox={{ y: [0, ROOM_HEIGHT], x: [-ROOM_WIDTH, ROOM_WIDTH * 5] }}>
