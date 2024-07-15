@@ -80,22 +80,22 @@ function AdjustableMirror({ midpoint, setMidpoint }) {
     return [ROOM_WIDTH, y];
   };
 
-  const [start, setStart] = React.useState<vec.Vector2>([ROOM_WIDTH, 1]);
-  const [end, setEnd] = React.useState([ROOM_WIDTH, 0] as vec.Vector2);
+  const [top, setTop] = React.useState<vec.Vector2>([ROOM_WIDTH, 1]);
+  const [bottom, setBottom] = React.useState([ROOM_WIDTH, 0] as vec.Vector2);
 
   return (
     <>
-      <Point x={start[0]} y={start[1]} color={Theme.blue} svgCircleProps={{ r: 2 }} />
-      <Line.Segment point1={start} point2={end} color={Theme.blue} weight={6} />
-      <Point x={end[0]} y={end[1]} color={Theme.blue} svgCircleProps={{ r: 2 }} />
+      <Point x={top[0]} y={top[1]} color={Theme.blue} svgCircleProps={{ r: 2 }} />
+      <Line.Segment point1={top} point2={bottom} color={Theme.blue} weight={6} />
+      <Point x={bottom[0]} y={bottom[1]} color={Theme.blue} svgCircleProps={{ r: 2 }} />
       <MovablePoint
         point={midpoint}
         color={'#096bff'}
         constrain={constrain}
         onMove={(newPoint) => {
           setMidpoint(newPoint);
-          setStart([newPoint[0], newPoint[1] + 0.5]);
-          setEnd([newPoint[0], newPoint[1] - 0.5]);
+          setTop([newPoint[0], newPoint[1] + 0.5]);
+          setBottom([newPoint[0], newPoint[1] - 0.5]);
         }}
       />
     </>
@@ -144,7 +144,7 @@ function TriangleObject() {
         fillOpacity={1}
         weight={0}
       />
-      {renderVirtualObjects(4)}
+      {renderVirtualObjects(7)}
     </>
   );
 }
@@ -156,6 +156,24 @@ export default function App() {
   const userAngle = Math.atan2(midpoint[1], midpoint[0]);
 
   // TODO: Check if light ray passes through any virtual object
+  const initialObject = { x: 3, y: 2 };
+  const OBJECTS = Array.from(new Array(7)).map((_, index) => {
+    const start = index - 1;
+    return { x: initialObject.x + ROOM_WIDTH * start, y: initialObject.y };
+  });
+  // useMemo useRef? since midpoint is in state.
+  const isIntersecting = React.useMemo(() => {
+    OBJECTS.forEach((object) => {
+      // does it intersect with the light ray?
+      // y = mx + b
+      // y = (midpoint[1] / midpoint[0]) x
+      const slope = midpoint[1] / midpoint[0];
+      // vec.lerp([0,0], midpoint, )
+      if (Math.round(slope * object.x) === object.y) {
+        console.log('we found a match!!', object);
+      }
+    });
+  }, [midpoint]);
 
   return (
     <Mafs viewBox={{ y: [0, ROOM_HEIGHT], x: [-ROOM_WIDTH, ROOM_WIDTH * 5] }}>
