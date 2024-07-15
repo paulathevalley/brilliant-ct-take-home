@@ -19,6 +19,7 @@ import range from 'lodash/range';
 
 const ROOM_WIDTH = 5;
 const ROOM_HEIGHT = 3;
+const VIRTUAL_COUNT = 7;
 
 function inverseRotate(v, a) {
   const c = Math.cos(a);
@@ -29,15 +30,35 @@ function inverseRotate(v, a) {
   return [v[0] * c + v[1] * s, v[0] * -1 * s + v[1] * c];
 }
 
-function Room() {
-  return (
-    <>
-      <Line.Segment point1={[0, ROOM_HEIGHT]} point2={[ROOM_WIDTH, ROOM_HEIGHT]} color="#ccc" weight={3} />
-      <Line.Segment point1={[0, 0]} point2={[0, ROOM_HEIGHT]} color={Theme.blue} weight={6} />
-      <Line.Segment point1={[ROOM_WIDTH, ROOM_HEIGHT]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
-      <Line.Segment point1={[0, 0]} point2={[ROOM_WIDTH, 0]} color="#ccc" weight={3} />
-    </>
-  );
+function Room({ count }) {
+  const renderRooms = Array.from(new Array(count)).map((_, index) => {
+    const indexStart = index - 1;
+    const isEven = indexStart % 2 === 0;
+    const x1 = ROOM_WIDTH * indexStart;
+    const isRealRoom = indexStart === 0;
+    const wallProps = { color: '#ccc', weight: 3, opacity: isRealRoom ? 1 : 0.5 };
+    const mirrorProps = { color: Theme.blue, weight: 6, opacity: isRealRoom ? 1 : 0.5 };
+
+    return (
+      <React.Fragment key={`virtual-room-${index}`}>
+        {/* top wall */}
+        <Line.Segment point1={[x1, ROOM_HEIGHT]} point2={[x1 + ROOM_WIDTH, ROOM_HEIGHT]} {...wallProps} />
+        {/* bottom wall */}
+        <Line.Segment point1={[x1, 0]} point2={[x1 + ROOM_WIDTH, 0]} {...wallProps} />
+        {/* right wall */}
+        {isEven ? null : <Line.Segment point1={[x1 + ROOM_WIDTH, 0]} point2={[x1 + ROOM_WIDTH, ROOM_HEIGHT]} {...wallProps} />}
+        {isRealRoom ? <Line.Segment point1={[x1 + ROOM_WIDTH, 0]} point2={[x1 + ROOM_WIDTH, ROOM_HEIGHT]} {...wallProps} /> : null}
+        {/* left wall/mirror */}
+        {isEven ? (
+          <Line.Segment point1={[x1, 0]} point2={[x1, ROOM_HEIGHT]} {...mirrorProps} />
+        ) : (
+          <Line.Segment point1={[x1, 0]} point2={[x1, ROOM_HEIGHT]} {...wallProps} />
+        )}
+      </React.Fragment>
+    );
+  });
+
+  return <>{renderRooms}</>;
 }
 
 function ObservingEye({ at, color }) {
@@ -144,7 +165,7 @@ function TriangleObject() {
         fillOpacity={1}
         weight={0}
       />
-      {renderVirtualObjects(7)}
+      {renderVirtualObjects(VIRTUAL_COUNT)}
     </>
   );
 }
@@ -157,20 +178,21 @@ export default function App() {
 
   // TODO: Check if light ray passes through any virtual object
   const initialObject = { x: 3, y: 2 };
-  const OBJECTS = Array.from(new Array(7)).map((_, index) => {
+  const OBJECTS = Array.from(new Array(VIRTUAL_COUNT)).map((_, index) => {
     const start = index - 1;
     return { x: initialObject.x + ROOM_WIDTH * start, y: initialObject.y };
   });
   // useMemo useRef? since midpoint is in state.
   const isIntersecting = React.useMemo(() => {
-    OBJECTS.forEach((object) => {
+    return OBJECTS.filter((object) => {
       // does it intersect with the light ray?
       // y = mx + b
       // y = (midpoint[1] / midpoint[0]) x
       const slope = midpoint[1] / midpoint[0];
-      // vec.lerp([0,0], midpoint, )
-      if (Math.round(slope * object.x) === object.y) {
-        console.log('we found a match!!', object);
+      const slopeY = slope * object.x;
+      if (Math.round(slopeY) === object.y) {
+        // console.log('we found a match!!', object);
+        return object;
       }
     });
   }, [midpoint]);
@@ -179,7 +201,7 @@ export default function App() {
     <Mafs viewBox={{ y: [0, ROOM_HEIGHT], x: [-ROOM_WIDTH, ROOM_WIDTH * 5] }}>
       <Coordinates.Cartesian />
 
-      <Room />
+      <Room count={VIRTUAL_COUNT} />
 
       <TriangleObject />
 
