@@ -55,55 +55,39 @@ function ObservingEye({ at, color }) {
 }
 
 // reference: dynamic movable points https://mafs.dev/guides/interaction/movable-points
-function AdjustableMirror() {
+function AdjustableMirror({ midpoint, setMidpoint }) {
   const constrain: UseMovablePointArguments['constrain'] = ([x, y]) => {
+    const mirrorMidpointBounds = [0.5, ROOM_HEIGHT - 0.5];
     // Only allow lengthening the mirror (along the y-axis)
     // and do not break out of room
-    if (y < 0) {
-      return [ROOM_WIDTH, 0];
+    if (y < mirrorMidpointBounds[0]) {
+      return [ROOM_WIDTH, mirrorMidpointBounds[0]];
     }
-    if (y > ROOM_HEIGHT) {
-      return [ROOM_WIDTH, ROOM_HEIGHT];
+    if (y > mirrorMidpointBounds[1]) {
+      return [ROOM_WIDTH, mirrorMidpointBounds[1]];
     }
     return [ROOM_WIDTH, y];
   };
-  const start = useMovablePoint([ROOM_WIDTH, 2], {
-    constrain: constrain,
-    color: Theme.blue,
-  });
-  const end = useMovablePoint([ROOM_WIDTH, 0], {
-    constrain: constrain,
-    color: Theme.blue,
-  });
 
-  function shift(shiftBy: vec.Vector2) {
-    // Only allow shifting along the y-axis
-    // TODO: do not break out of room
-    start.setPoint(vec.add(start.point, [0, shiftBy[1]]));
-    end.setPoint(vec.add(end.point, [0, shiftBy[1]]));
-  }
-
-  const length = vec.dist(start.point, end.point);
-  const START = 0.75;
-  const STEP = 0.75;
-  const END = length - 0.75;
-  const betweenPoints = range(START, END, STEP).map((t) => vec.lerp(start.point, end.point, t / length));
+  const [start, setStart] = React.useState<vec.Vector2>([ROOM_WIDTH, 1]);
+  const [end, setEnd] = React.useState([ROOM_WIDTH, 0] as vec.Vector2);
+  // const [midPoint, setMidpoint] = React.useState<vec.Vector2>(vec.lerp(start, end, 0.5));
 
   return (
     <>
-      <Line.Segment point1={start.point} point2={end.point} color={Theme.blue} weight={6} />
-      {start.element}
-      {betweenPoints.map((point, i) => (
-        <MovablePoint
-          key={i}
-          point={point}
-          color={'#096bff'}
-          onMove={(newPoint) => {
-            shift(vec.sub(newPoint, point));
-          }}
-        />
-      ))}
-      {end.element}
+      <Point x={start[0]} y={start[1]} color={Theme.blue} svgCircleProps={{ r: 2 }} />
+      <Line.Segment point1={start} point2={end} color={Theme.blue} weight={6} />
+      <Point x={end[0]} y={end[1]} color={Theme.blue} svgCircleProps={{ r: 2 }} />
+      <MovablePoint
+        point={midpoint}
+        color={'#096bff'}
+        constrain={constrain}
+        onMove={(newPoint) => {
+          setMidpoint(newPoint);
+          setStart([newPoint[0], newPoint[1] + 0.5]);
+          setEnd([newPoint[0], newPoint[1] - 0.5]);
+        }}
+      />
     </>
   );
 }
@@ -167,19 +151,10 @@ function Room() {
 }
 
 export default function App() {
-  const radius = 3;
-  // Reference: https://mafs.dev/guides/interaction/movable-point
-  const radialMotion = useMovablePoint([radius, 0], {
-    constrain: (point) => {
-      const angle = Math.atan2(point[1], point[0]);
-      const newPoint = vec.rotate([radius, 0], angle);
-      return newPoint;
-    },
-    color: Theme.violet,
-  });
+  const [midpoint, setMidpoint] = React.useState<vec.Vector2>(vec.lerp([ROOM_WIDTH, 1], [ROOM_WIDTH, 0], 0.5));
 
   // atan2 returns the angle in the plane (in radians)
-  const userAngle = Math.atan2(radialMotion.point[1], radialMotion.point[0]);
+  const userAngle = Math.atan2(midpoint[1], midpoint[0]);
 
   return (
     <Mafs viewBox={{ y: [0, ROOM_HEIGHT], x: [-ROOM_WIDTH, ROOM_WIDTH * 5] }}>
@@ -189,13 +164,13 @@ export default function App() {
 
       <TriangleObject />
 
-      <AdjustableMirror />
-
-      <Vector tail={[0, 0]} tip={radialMotion.point} color={Theme.violet} />
-      {radialMotion.element}
+      {/* <Vector tail={[0, 0]} tip={midPoint} color={Theme.violet} /> */}
+      <Line.ThroughPoints point1={[0, 0]} point2={midpoint} color={Theme.violet} style="dashed" />
       <Transform rotate={userAngle}>
-        <ObservingEye at={[0, 0]} color={Theme.violet} />
+        <ObservingEye at={[0, 0]} color={'#000'} />
       </Transform>
+
+      <AdjustableMirror midpoint={midpoint} setMidpoint={setMidpoint} />
 
       {/* <Debug.TransformWidget> */}
       {/* <PizzaSlice /> */}
