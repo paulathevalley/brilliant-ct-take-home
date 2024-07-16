@@ -7,7 +7,7 @@
     "check": "npx prettier --check ./src",
     "format": "npx prettier --write ./src",
     "clean": "rimraf .astro && rimraf dist",
-    "dev": "astro dev",
+    "dev": "astro dev --verbose",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview"
