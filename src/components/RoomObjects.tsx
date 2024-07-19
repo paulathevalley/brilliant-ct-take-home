@@ -12,7 +12,7 @@ export function RoomObjects(props: Props) {
   const { count, width, height, initial } = props;
   // render real object & virtual objects
 
-  const OFFSET = [0.25 * 1.3, 0.25];
+  const OFFSET = [0.25, 0.25];
 
   const renderVirtualObjects = (count: number) => {
     const virtualObjectsArray = Array.from(new Array(count));

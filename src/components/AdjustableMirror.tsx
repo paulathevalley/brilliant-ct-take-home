@@ -1,20 +1,5 @@
 import * as React from 'react';
-import {
-  Coordinates,
-  Debug,
-  Line,
-  Mafs,
-  MovablePoint,
-  Plot,
-  Point,
-  Polygon,
-  Theme,
-  Transform,
-  useMovablePoint,
-  vec,
-  Vector,
-  type UseMovablePointArguments,
-} from 'mafs';
+import { Debug, Line, MovablePoint, Theme, useMovablePoint, vec, type UseMovablePointArguments } from 'mafs';
 
 type Props = {
   count: number;
@@ -41,6 +26,7 @@ export const AdjustableMirror = ({ count, height, width, midpoint, setMidpoint, 
     return [width, y];
   };
 
+  // TODO: To make mirror length adjustable, replace top & bottom with `useMovablePoint()` from Mafs
   const [top, setTop] = React.useState<vec.Vector2>(initialMirrorPosition[0]);
   const [bottom, setBottom] = React.useState(initialMirrorPosition[1] as vec.Vector2);
 

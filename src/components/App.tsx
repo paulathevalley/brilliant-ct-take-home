@@ -25,26 +25,24 @@ export default function App() {
     [ROOM_WIDTH, 1.5],
   ];
   const [midpoint, setMidpoint] = React.useState<vec.Vector2>(vec.lerp(initialMirrorPosition[0], initialMirrorPosition[1], 0.5));
-  // how many intersections has the learner found?
-  // const [foundIntersections, setFoundIntersections] = React.useState<vec.Vector2[]>([]);
+  // does the light ray intersect with the object and the observer (eye)?
   const [activeIntersection, setActiveIntersection] = React.useState<vec.Vector2 | null>(null);
   const [reflectionPoints, setReflectionPoints] = React.useState<{ point1: vec.Vector2; point2: vec.Vector2 }[] | null>(null);
 
-  // atan2 returns the angle in the plane (in radians)
+  // atan2 returns the angle in the plane (in radians) to determine the directionality of the observer (eye)
   const userAngle = Math.atan2(midpoint[1], midpoint[0]);
 
+  // generate virtual object positions
   const objectsArray = Array.from(new Array(VIRTUAL_COUNT));
-
   const OBJECTS: vec.Vector2[] = objectsArray.map((_, index) => {
     const start = index + 1;
     return [INITIAL_OBJECT[0] + ROOM_WIDTH * start, INITIAL_OBJECT[1]];
   });
 
   React.useMemo(() => {
+    // Does the light ray intersect with the real or virtual object?
     const intersections = OBJECTS.filter((object) => {
-      // does it intersect with the light ray?
-      // y = mx + b
-      // y = (midpoint[1] / midpoint[0]) x
+      // does it intersect with the light ray? (y = mx + b)
       const slope = midpoint[1] / midpoint[0];
       const pointerY = slope * object[0];
       // Mafs is very precise, but the learner’s pointer is not
@@ -57,14 +55,18 @@ export default function App() {
       return roundedY === object[1];
     });
     if (!intersections.length) {
+      // clear all rendered light rays
       setActiveIntersection(null);
       setReflectionPoints(null);
     }
   }, [midpoint]);
 
   React.useMemo(() => {
+    // Find the intersection points with real & virtual mirrors
+    // Use these points to determine the reflected light rays in the 'real room'
+    // Build line segments using the found reflected light rays
+    // FIXME: the angles do not look correct when initial object is at [4,2] with 1 active intersection point
     if (activeIntersection) {
-      // find reflection point
       const slope = activeIntersection[1] / activeIntersection[0];
       // how many virtual rooms are we in?
       const roomCount = Math.floor(activeIntersection[0] / ROOM_WIDTH);
@@ -77,6 +79,7 @@ export default function App() {
       });
 
       // find reflection points in 'real room' where domain is [0, ROOM_WIDTH]
+      // FIXME: consider using vec.rotate() instead to generate these line segments
       const buildLineSegment = (index: number): { point1: vec.Vector2; point2: vec.Vector2 } => {
         if (index <= 0) {
           return { point1: [0, 0], point2: mirrorIntersections[0] };
@@ -103,10 +106,12 @@ export default function App() {
 
         return { point1: point1, point2: point2 };
       };
-      // build line segment for each reflection point
+
+      // build up line segments so they can be easily rendered below
       const lineSegments = [...roomCountArray, undefined].map((_, index) => {
         return buildLineSegment(index);
       });
+
       setReflectionPoints(lineSegments);
     }
   }, [activeIntersection]);
