@@ -2,7 +2,6 @@
   "name": "brilliant-ct-take-home",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "check": "npx prettier --check ./src",
     "format": "npx prettier --write ./src",
@@ -12,8 +11,7 @@
     "build": "astro build",
     "preview": "astro preview"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Paula Lavalle",
   "dependencies": {
     "@astrojs/react": "^3.6.0",
     "@types/react": "^18.3.3",

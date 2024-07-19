@@ -2,7 +2,7 @@
 
 ## Requirements
 
-Node: v21.10
+Node: v21.10 [nvm](https://github.com/nvm-sh/nvm)
 
 ## Getting Started
 
