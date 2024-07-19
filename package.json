@@ -8,6 +8,7 @@
     "clean": "rimraf .astro && rimraf dist",
     "dev": "astro dev --verbose",
     "start": "astro dev",
+    "prebuild": "NODE_ENV=production npm run clean",
     "build": "astro build",
     "preview": "astro preview"
   },

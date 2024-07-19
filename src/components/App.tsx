@@ -20,12 +20,14 @@ const INITIAL_OBJECT = [3, 2];
 // }
 
 export default function App() {
+  const mirrorTop = 2.5;
+  const mirrorBottom = 1.5;
   const initialMirrorPosition: vec.Vector2[] = [
-    [ROOM_WIDTH, 2.5],
-    [ROOM_WIDTH, 1.5],
+    [ROOM_WIDTH, mirrorTop],
+    [ROOM_WIDTH, mirrorBottom],
   ];
+  const mirrorLength = mirrorTop - mirrorBottom;
   const [midpoint, setMidpoint] = React.useState<vec.Vector2>(vec.lerp(initialMirrorPosition[0], initialMirrorPosition[1], 0.5));
-  // does the light ray intersect with the object and the observer (eye)?
   const [activeIntersection, setActiveIntersection] = React.useState<vec.Vector2 | null>(null);
   const [reflectionPoints, setReflectionPoints] = React.useState<{ point1: vec.Vector2; point2: vec.Vector2 }[] | null>(null);
 
@@ -141,7 +143,8 @@ export default function App() {
       <AdjustableMirror
         count={VIRTUAL_COUNT}
         height={ROOM_HEIGHT}
-        initialMirrorPosition={initialMirrorPosition}
+        initialLength={mirrorLength}
+        initialPosition={initialMirrorPosition}
         midpoint={midpoint}
         setMidpoint={setMidpoint}
         width={ROOM_WIDTH}
