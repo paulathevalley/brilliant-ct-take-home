@@ -118,7 +118,9 @@ export default function App() {
   ) : null;
 
   const renderReflectedLightRays = reflectionPoints
-    ? reflectionPoints.map(({ point1, point2 }) => <Line.Segment point1={point1} point2={point2} color={Theme.violet} style="solid" />)
+    ? reflectionPoints.map(({ point1, point2 }, index) => (
+        <Line.Segment key={`reflected-lightrays-${index}`} point1={point1} point2={point2} color={Theme.violet} style="solid" />
+      ))
     : null;
 
   return (

@@ -10,7 +10,7 @@ type Props = {
 export function RoomObjects(props: Props) {
   const { count, width, height } = props;
   // render real object & virtual objects
-  const triangle = {
+  const initial = {
     x: 3,
     y: 2,
   };
@@ -21,16 +21,16 @@ export function RoomObjects(props: Props) {
     const virtualObjectsArray = Array.from(new Array(count));
     return virtualObjectsArray.map((_, index) => {
       const indexStart = index - 1;
-      const x = triangle.x + width * indexStart;
+      const x = initial.x + width * indexStart;
       // if indexStart is even, it should be reflected over the y-axis ("backwards")
       const isEven = indexStart % 2 === 0;
       return (
         <Polygon
-          key={`virtual-triangle-${index}`}
+          key={`virtual-initial-${index}`}
           points={[
-            [isEven ? x - OFFSET[0] : x + OFFSET[0], triangle.y + OFFSET[1]],
-            [isEven ? x - OFFSET[0] : x + OFFSET[0], triangle.y - OFFSET[1]],
-            [x, triangle.y],
+            [isEven ? x - OFFSET[0] : x + OFFSET[0], initial.y + OFFSET[1]],
+            [isEven ? x - OFFSET[0] : x + OFFSET[0], initial.y - OFFSET[1]],
+            [x, initial.y],
           ]}
           color={Theme.red}
           fillOpacity={0.5}
@@ -44,9 +44,9 @@ export function RoomObjects(props: Props) {
     <>
       <Polygon
         points={[
-          [triangle.x - OFFSET[0], triangle.y + OFFSET[1]],
-          [triangle.x - OFFSET[0], triangle.y - OFFSET[1]],
-          [triangle.x, triangle.y],
+          [initial.x - OFFSET[0], initial.y + OFFSET[1]],
+          [initial.x - OFFSET[0], initial.y - OFFSET[1]],
+          [initial.x, initial.y],
         ]}
         color={Theme.red}
         fillOpacity={1}
