@@ -1,0 +1,29 @@
+{
+  "name": "brilliant-ct-take-home",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "check": "npx prettier --check ./src",
+    "format": "npx prettier --write ./src",
+    "clean": "rimraf .astro && rimraf dist",
+    "dev": "astro dev --verbose",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@astrojs/react": "^3.6.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "astro": "^4.11.5",
+    "lodash": "^4.17.21",
+    "mafs": "^0.18.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "rimraf": "^6.0.1",
+    "vite-plugin-svgr": "^4.2.0"
+  }
+}
