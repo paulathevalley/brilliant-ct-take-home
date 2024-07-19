@@ -23,5 +23,8 @@
     "react-dom": "^18.3.1",
     "rimraf": "^6.0.1",
     "vite-plugin-svgr": "^4.2.0"
+  },
+  "engines": {
+    "node": "21.x"
   }
 }
