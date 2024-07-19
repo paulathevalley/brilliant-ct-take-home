@@ -44,7 +44,14 @@ export const AdjustableMirror = ({ count, height, width, midpoint, setMidpoint, 
       const renderMirror = !isRealMirror && (indexStart === -1 || isEven);
 
       return renderMirror ? (
-        <Line.Segment key={`virtual-mirror-${index}`} point1={[x1, top[1]]} point2={[x1, bottom[1]]} color={Theme.blue} weight={6} />
+        <Line.Segment
+          key={`virtual-mirror-${index}`}
+          point1={[x1, top[1]]}
+          point2={[x1, bottom[1]]}
+          color={Theme.blue}
+          weight={6}
+          opacity={0.5}
+        />
       ) : null;
     });
   }, [top, bottom]);

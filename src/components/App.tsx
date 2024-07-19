@@ -49,10 +49,20 @@ export default function App() {
       const pointerY = slope * object[0];
       // Mafs is very precise, but the learner’s pointer is not
       const roundedY = Math.round(pointerY);
+      const virtualRoomCount = Math.floor(object[0] / ROOM_WIDTH);
       if (roundedY === object[1]) {
-        // if object[0] (x) is greater than the 1st virtual mirror's x position,
-        // then we also need to check whether the slope intersects with the virtual mirror
-        setActiveIntersection(object);
+        if (virtualRoomCount > 2) {
+          // check whether light ray intersects with all short mirrors
+          const wallX = ROOM_WIDTH * virtualRoomCount;
+          const wallY = slope * wallX;
+          const mirrorTop = midpoint[1] + mirrorLength / 2;
+          const virtualMirrorIntersects = mirrorTop > wallY;
+          if (virtualMirrorIntersects) {
+            setActiveIntersection(object);
+          }
+        } else {
+          setActiveIntersection(object);
+        }
       }
       return roundedY === object[1];
     });
