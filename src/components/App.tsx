@@ -140,7 +140,7 @@ export default function App() {
     : null;
 
   return (
-    <Mafs viewBox={{ y: [0, ROOM_HEIGHT], x: [-ROOM_WIDTH, ROOM_WIDTH * 5] }}>
+    <Mafs viewBox={{ y: [0, ROOM_HEIGHT], x: [ROOM_WIDTH / -2, ROOM_WIDTH * 5] }}>
       <Coordinates.Cartesian />
 
       <Rooms width={ROOM_WIDTH} height={ROOM_HEIGHT} count={VIRTUAL_COUNT} />
