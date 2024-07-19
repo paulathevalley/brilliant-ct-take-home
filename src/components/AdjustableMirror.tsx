@@ -16,42 +16,54 @@ import {
   type UseMovablePointArguments,
 } from 'mafs';
 
-type Props {}
+type Props = {
+  count: number;
+  height: number;
+  initialMirrorPosition: vec.Vector2[];
+  midpoint: vec.Vector2;
+  setMidpoint: React.Dispatch<React.SetStateAction<vec.Vector2>>;
+  width: number;
+};
 
 // reference: dynamic movable points https://mafs.dev/guides/interaction/movable-points
-export const AdjustableMirror = ({ midpoint, setMidpoint }: Props) => {
+export const AdjustableMirror = ({ count, height, width, midpoint, setMidpoint, initialMirrorPosition }: Props) => {
   // render adjustable mirror & virtual mirrors
   const constrain: UseMovablePointArguments['constrain'] = ([x, y]) => {
-    const mirrorMidpointBounds = [0.5, ROOM_HEIGHT - 0.5];
+    const mirrorMidpointBounds = [0.5, height - 0.5];
     // Only allow lengthening the mirror (along the y-axis)
     // and do not break out of room
     if (y < mirrorMidpointBounds[0]) {
-      return [ROOM_WIDTH, mirrorMidpointBounds[0]];
+      return [width, mirrorMidpointBounds[0]];
     }
     if (y > mirrorMidpointBounds[1]) {
-      return [ROOM_WIDTH, mirrorMidpointBounds[1]];
+      return [width, mirrorMidpointBounds[1]];
     }
-    return [ROOM_WIDTH, y];
+    return [width, y];
   };
 
-  const [top, setTop] = React.useState<vec.Vector2>([ROOM_WIDTH, 1]);
-  const [bottom, setBottom] = React.useState([ROOM_WIDTH, 0] as vec.Vector2);
+  const [top, setTop] = React.useState<vec.Vector2>(initialMirrorPosition[0]);
+  const [bottom, setBottom] = React.useState(initialMirrorPosition[1] as vec.Vector2);
 
-  // const renderVirtualMirrors = Array.from(new Array(VIRTUAL_COUNT)).map((_, index) => {
-  //   const indexStart = index - 1;
-  //   const isEven = indexStart % 2 === 0;
-  //   const isRealMirror = indexStart === 0;
-  //   const x1 = top[0] + ROOM_WIDTH * indexStart;
+  const virtualMirrorsArray = Array.from(new Array(count));
 
-  //   const renderMirror = indexStart === -1 || (isEven && !isRealMirror);
-  //   // if (renderMirror) {
-  //   //   console.log(indexStart, top[0], ROOM_WIDTH * indexStart);
-  //   // }
-  //   return renderMirror ? <Line.Segment point1={[x1, top[1]]} point2={[x1, bottom[1]]} color={Theme.blue} weight={6} /> : null;
-  // });
+  const renderVirtualMirrors = React.useMemo(() => {
+    return virtualMirrorsArray.map((_, index) => {
+      const indexStart = index - 1;
+      const isEven = indexStart % 2 === 0;
+      const isRealMirror = indexStart === 0;
+      const x1 = top[0] + width * indexStart;
+
+      const renderMirror = indexStart === -1 || (isEven && !isRealMirror);
+
+      return renderMirror ? (
+        <Line.Segment key={`virtual-mirror-${index}`} point1={[x1, top[1]]} point2={[x1, bottom[1]]} color={Theme.blue} weight={6} />
+      ) : null;
+    });
+  }, [top, bottom]);
 
   return (
     <>
+      {renderVirtualMirrors}
       <Line.Segment point1={top} point2={bottom} color={Theme.blue} weight={6} />
       <MovablePoint
         point={midpoint}
@@ -65,4 +77,4 @@ export const AdjustableMirror = ({ midpoint, setMidpoint }: Props) => {
       />
     </>
   );
-}
+};

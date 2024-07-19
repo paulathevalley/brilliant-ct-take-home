@@ -1,7 +1,14 @@
 import * as React from 'react';
 import { Coordinates, Debug, Line, Mafs, MovablePoint, Plot, Point, Polygon, Theme, Transform, useMovablePoint, vec, Vector } from 'mafs';
 
-function TriangleObject() {
+type Props = {
+  width: number;
+  height: number;
+  count: number;
+};
+
+export function RoomObjects(props: Props) {
+  const { count, width, height } = props;
   // render real object & virtual objects
   const triangle = {
     x: 3,
@@ -10,10 +17,11 @@ function TriangleObject() {
 
   const OFFSET = [0.25 * 1.3, 0.25];
 
-  const renderVirtualObjects = (count) => {
-    return Array.from(new Array(count)).map((_, index) => {
+  const renderVirtualObjects = (count: number) => {
+    const virtualObjectsArray = Array.from(new Array(count));
+    return virtualObjectsArray.map((_, index) => {
       const indexStart = index - 1;
-      const x = triangle.x + ROOM_WIDTH * indexStart;
+      const x = triangle.x + width * indexStart;
       // if indexStart is even, it should be reflected over the y-axis ("backwards")
       const isEven = indexStart % 2 === 0;
       return (
@@ -44,7 +52,7 @@ function TriangleObject() {
         fillOpacity={1}
         weight={0}
       />
-      {renderVirtualObjects(VIRTUAL_COUNT)}
+      {renderVirtualObjects(count)}
     </>
   );
 }
