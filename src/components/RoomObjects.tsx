@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Coordinates, Debug, Line, Mafs, MovablePoint, Plot, Point, Polygon, Theme, Transform, useMovablePoint, vec, Vector } from 'mafs';
+import { Polygon, Theme, vec } from 'mafs';
 
 type Props = {
   width: number;

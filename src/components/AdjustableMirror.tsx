@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Debug, Line, MovablePoint, Theme, useMovablePoint, vec, type UseMovablePointArguments } from 'mafs';
+import { Line, MovablePoint, Theme, vec, type UseMovablePointArguments } from 'mafs';
 
 type Props = {
   count: number;

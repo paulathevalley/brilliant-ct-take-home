@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Coordinates, Debug, Line, Mafs, MovablePoint, Plot, Point, Polygon, Theme, Transform, useMovablePoint, vec, Vector } from 'mafs';
+import { Coordinates, Line, Mafs, Theme, Transform, vec } from 'mafs';
 import { Rooms } from './Rooms.tsx';
 import { AdjustableMirror } from './AdjustableMirror.tsx';
 import { Observer } from './Observer.tsx';
