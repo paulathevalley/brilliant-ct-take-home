@@ -8,6 +8,7 @@ import { RoomObjects } from './RoomObjects.tsx';
 const ROOM_WIDTH = 5;
 const ROOM_HEIGHT = 3;
 const VIRTUAL_COUNT = 7;
+const INITIAL_OBJECT = [3, 2];
 
 // function inverseRotate(v, a) {
 //   const c = Math.cos(a);
@@ -32,13 +33,11 @@ export default function App() {
   // atan2 returns the angle in the plane (in radians)
   const userAngle = Math.atan2(midpoint[1], midpoint[0]);
 
-  // TODO: Check if light ray passes through any virtual object
-  const initialObject = { x: 3, y: 2 };
   const objectsArray = Array.from(new Array(VIRTUAL_COUNT));
 
   const OBJECTS: vec.Vector2[] = objectsArray.map((_, index) => {
     const start = index + 1;
-    return [initialObject.x + ROOM_WIDTH * start, initialObject.y];
+    return [INITIAL_OBJECT[0] + ROOM_WIDTH * start, INITIAL_OBJECT[1]];
   });
 
   React.useMemo(() => {
@@ -95,7 +94,7 @@ export default function App() {
           y2 = mirrorIntersections[index][1];
         } else {
           // the last line segment should end at the real object
-          x2 = initialObject.x;
+          x2 = INITIAL_OBJECT[0];
           y2 = activeIntersection[1];
         }
 
@@ -132,7 +131,7 @@ export default function App() {
       {renderActiveLightRay}
       {renderReflectedLightRays}
 
-      <RoomObjects width={ROOM_WIDTH} height={ROOM_HEIGHT} count={VIRTUAL_COUNT} />
+      <RoomObjects width={ROOM_WIDTH} height={ROOM_HEIGHT} count={VIRTUAL_COUNT} initial={INITIAL_OBJECT} />
 
       <AdjustableMirror
         count={VIRTUAL_COUNT}
